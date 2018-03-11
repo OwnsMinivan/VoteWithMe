@@ -117,7 +117,7 @@ def voice_test():
         #parsed_json = json.loads(request.data)
         print("Recieved Voice Call")
         data_body = "I hear you!"
-        response = SaveSMSData("+14079635555", data_body)
+        response = SaveSMSData("+14075555555", data_body)
     except KeyError as e:
         return "error. {}".format(request.headers)
         print(e)
