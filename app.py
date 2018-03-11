@@ -6,12 +6,14 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 dynamodb = boto3.resource("dynamodb", region_name='us-east-1')
 UserTable = dynamodb.Table('UsersDB1')
 QuestionTable = dynamodb.Table('QuestionDB')
 
 app = Flask(__name__)
+CORS(app)
 
 #--- Helper Functions ---
 
@@ -98,11 +100,23 @@ def sms_test_from_arrow():
         #print("Printing Headers: {}".format(request.headers))
         #parsed_json = json.loads(request.headers)
         #parsed_json = json.loads(request.data)
-        headers_data = request.headers
-        print(headers_data[6])
-        data = headers_data[6]
-        data_body = data.split("body: ")
-        print("This was an SMS test from Arrow. {}".format(data_body))
+        print("Recieved Arrow Message")
+        data_body = "High Five!"
+        response = SaveSMSData("+14079635555", data_body)
+    except KeyError as e:
+        return "error. {}".format(request.headers)
+        print(e)
+    else:
+        return "Thanks for participating!"
+
+@app.route('/voice_test/', methods=['POST'])
+def voice_test():
+    try:
+        #print("Printing Headers: {}".format(request.headers))
+        #parsed_json = json.loads(request.headers)
+        #parsed_json = json.loads(request.data)
+        print("Recieved Voice Call")
+        data_body = "I hear you!"
         response = SaveSMSData("+14079635555", data_body)
     except KeyError as e:
         return "error. {}".format(request.headers)
