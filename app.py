@@ -71,6 +71,20 @@ def sms_test():
     else:
         return "Thanks for participating!"
 
+@app.route('/sms_test/', methods=['POST'])
+def sms_test_from_arrow():
+    try:
+        parsed_json = json.loads(request.data)
+        parsed_from = parsed_json['from']
+        parsed_body = parsed_json['body']
+        print("This was an SMS test from Arrow. {}".format(parsed_json['body']))
+        response = SaveSMSData(parsed_from, parsed_body)
+    except KeyError as e:
+        return "error. {}".format(request.get_json())
+        print(e)
+    else:
+        return "Thanks for participating!"
+
 @app.route('/inbound', methods=['POST'])
 def inbound():
     print("Inbound Text: {}".format(request.form))
