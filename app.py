@@ -94,13 +94,17 @@ def sms_test():
 @app.route('/sms_test/', methods=['POST'])
 def sms_test_from_arrow():
     try:
-        parsed_json = json.loads(request.data)
-        parsed_from = parsed_json['from']
-        parsed_body = parsed_json['body']
-        print("This was an SMS test from Arrow. {}".format(parsed_json['body']))
-        response = SaveSMSData(parsed_from, parsed_body)
+        #print("Printing Headers: {}".format(request.headers))
+        #parsed_json = json.loads(request.headers)
+        #parsed_json = json.loads(request.data)
+        headers_data = request.headers
+        print(headers_data[6])
+        data = headers_data[6]
+        data_body = data.split("body: ")
+        print("This was an SMS test from Arrow. {}".format(data_body))
+        response = SaveSMSData("+14079635555", data_body)
     except KeyError as e:
-        return "error. {}".format(request.get_json())
+        return "error. {}".format(request.headers)
         print(e)
     else:
         return "Thanks for participating!"
