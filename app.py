@@ -1,6 +1,7 @@
 import boto3
 import json
 from botocore.exceptions import ClientError
+from boto3.dynamodb.conditions import Key, Attr
 
 from flask import Flask, jsonify, request
 
@@ -43,6 +44,16 @@ def IncrementQuestionID(sessionID, new_questionID):
     else:
         return True
 
+def SaveSMSData(_from, _body):
+    questionID = GetQuestionID("12345")
+    response = UserTable.put_item(
+        Item={
+                'QuestionID': questionID,
+                'From': _from,
+                'Body': _body,
+                'SessionID': "12345"
+            }
+        )
 
 #-----Core Routing ---
 
@@ -53,11 +64,12 @@ def sms_test():
         parsed_from = parsed_json['from']
         parsed_body = parsed_json['body']
         print("This was an SMS test. {}".format(parsed_json['body']))
+        response = SaveSMSData(parsed_from, parsed_body)
     except KeyError as e:
         return "error. {}".format(request.get_json())
         print(e)
     else:
-        return "Hello {}".format(request.get_json())
+        return "Thanks for participating!"
 
 @app.route('/inbound', methods=['POST'])
 def inbound():
@@ -69,19 +81,17 @@ def test_update(sessionID):
     questionID = GetQuestionID(sessionID)
     print("this is the questionID I have: {}".format(questionID))
     try:
-        response = UserTable.get_item(
-            Key={
-                'QuestionID': questionID
-            }
+        response = UserTable.query(
+            KeyConditionExpression=Key('QuestionID').eq(questionID)
         )
     except ClientError as e:
         print(e.response['Error']['Message'])
     else:
-        item = response['Item']
+        items = response['Items']
         print("GetItem succeeded:")
-        return jsonify(item)
+        return jsonify(items)
 
-@app.route('/question/data/<sessionID>/next/', methods=['POST'])
+@app.route('/question/data/<sessionID>/next', methods=['POST'])
 def next(sessionID):
     print("I got this sessionID to increment the question: {}".format(sessionID))
     questionID = GetQuestionID(sessionID)
