@@ -7,7 +7,7 @@ from flask import Flask, jsonify, request
 
 dynamodb = boto3.resource("dynamodb", region_name='us-east-1')
 UserTable = dynamodb.Table('UsersDB1')
-QuestionTable = dynamodb.Table('QuestionDB1')
+QuestionTable = dynamodb.Table('QuestionDB')
 
 app = Flask(__name__)
 
@@ -35,7 +35,7 @@ def IncrementQuestionID(sessionID, new_questionID):
             },
             UpdateExpression="set QuestionID = :p",
             ExpressionAttributeValues={
-                ':p': new_questionID
+                ':p': str(new_questionID)
             },
             ReturnValues="UPDATED_NEW"
         )
@@ -48,7 +48,7 @@ def SaveSMSData(_from, _body):
     questionID = GetQuestionID("12345")
     response = UserTable.put_item(
         Item={
-                'QuestionID': questionID,
+                'QuestionID': str(questionID),
                 'From': _from,
                 'Body': _body,
                 'SessionID': "12345"
