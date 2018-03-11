@@ -1,5 +1,7 @@
 import boto3
 import json
+import requests
+
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -54,6 +56,24 @@ def SaveSMSData(_from, _body):
                 'SessionID': "12345"
             }
         )
+
+def sendReply(_from):
+    """ Need to edit the secret and the from
+    """
+    url = "https://sms.telnyx.com/messages"
+    body = "Thanks for participating!"
+    headers = {
+        "Content-Type: application/json",
+        "Accept: application/json",
+        "x-profile-secret: MESSAGING_PROFILE_SECRET"
+        }
+    payload = {
+        'To': _from, 
+        'From': '+14077511701', 
+        'Body': body
+        }
+    r = requests.post(url, params=payload)
+    return r.status.code
 
 #-----Core Routing ---
 
