@@ -56,6 +56,7 @@ def SaveSMSData(_from, _body):
                 'SessionID': "12345"
             }
         )
+    return True
 
 def sendReply(_from):
     """ Need to edit the secret and the from
